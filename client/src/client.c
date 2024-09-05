@@ -15,21 +15,22 @@ int main(void)
 	/* ---------------- LOGGING ---------------- */
 
 	logger = iniciar_logger();
-
-	// Usando el logger creado previamente
-	// Escribi: "Hola! Soy un log"
+	log_info (logger,"Hola! Soy un log");
 
 
 	/* ---------------- ARCHIVOS DE CONFIGURACION ---------------- */
 
 	config = iniciar_config();
+	valor = config_get_string_value(config, "CLAVE");
+	log_info(logger, &valor);
 
 	// Usando el config creado previamente, leemos los valores del config y los 
 	// dejamos en las variables 'ip', 'puerto' y 'valor'
 
 	// Loggeamos el valor de config
 
-
+	log_destroy(logger);
+	config_destroy(config);
 	/* ---------------- LEER DE CONSOLA ---------------- */
 
 	leer_consola(logger);
@@ -53,15 +54,21 @@ int main(void)
 }
 
 t_log* iniciar_logger(void)
-{
-	t_log* nuevo_logger;
-
-	return nuevo_logger;
+{	//siempre debemos de ver las clases de retorno de una funcion y trabajar con estas
+	//log devuelve NULL si no se pudo crear o hubo otro error
+	if(log_create("tp0.log","logger", true, LOG_LEVEL_INFO) == NULL){
+		perror("No se pudo crear el log por algún error!");
+		abort();
+	}
+	else{
+		t_log* nuevo_logger = log_create("tp0.log","logger", true, LOG_LEVEL_INFO);
+		return nuevo_logger;
+	}
 }
 
 t_config* iniciar_config(void)
 {
-	t_config* nuevo_config;
+	t_config* nuevo_config = config_create("cliente.config");
 
 	return nuevo_config;
 }
