@@ -1,8 +1,8 @@
 #include "client.h"
+#include <readline/readline.h>
 
 int main(void)
 {
-	/*---------------------------------------------------PARTE 2-------------------------------------------------------------*/
 
 	int conexion;
 	char* ip;
@@ -21,16 +21,18 @@ int main(void)
 	/* ---------------- ARCHIVOS DE CONFIGURACION ---------------- */
 
 	config = iniciar_config();
-	valor = config_get_string_value(config, "CLAVE");
-	log_info(logger, &valor);
+	//ip = config_get_string_value(config, "IP");
+	//puerto = config_get_string_value(config, "PUERTO");
+	//valor = config_get_string_value(config, "CLAVE");
 
-	// Usando el config creado previamente, leemos los valores del config y los 
-	// dejamos en las variables 'ip', 'puerto' y 'valor'
+	//log_if_config_has_key(config, key)
 
-	// Loggeamos el valor de config
+	log_if_config_has_key(logger, config, "IP");
+	log_if_config_has_key(logger, config, "PUERTO");
+	log_if_config_has_key(logger, config, "CLAVE");
 
-	log_destroy(logger);
-	config_destroy(config);
+
+
 	/* ---------------- LEER DE CONSOLA ---------------- */
 
 	leer_consola(logger);
@@ -54,23 +56,34 @@ int main(void)
 }
 
 t_log* iniciar_logger(void)
-{	//siempre debemos de ver las clases de retorno de una funcion y trabajar con estas
-	//log devuelve NULL si no se pudo crear o hubo otro error
-	if(log_create("tp0.log","logger", true, LOG_LEVEL_INFO) == NULL){
+{	
+	t_log* nuevo_logger = log_create("cliente.log","CL_logger", true, LOG_LEVEL_INFO);
+	if(nuevo_logger == NULL){
 		perror("No se pudo crear el log por algún error!");
-		abort();
+		exit(EXIT_FAILURE);
 	}
-	else{
-		t_log* nuevo_logger = log_create("tp0.log","logger", true, LOG_LEVEL_INFO);
 		return nuevo_logger;
-	}
 }
 
 t_config* iniciar_config(void)
 {
-	t_config* nuevo_config = config_create("cliente.config");
-
+	t_config* nuevo_config = config_create("cliente.config");		return nuevo_config;
+	if(nuevo_config == NULL){
+		perror("No se pudo crear el .config por algún error!");
+		exit(EXIT_FAILURE);
+	}
 	return nuevo_config;
+}
+
+void log_if_config_has_key( t_log* logger,t_config* config, char* key)
+{
+	if(!config_has_property(config,key)){
+		perror("El config no tiene la key");
+		perror(key);
+		exit(EXIT_FAILURE);
+	}
+	char* valor = config_get_string_value(config, key);
+	log_info(logger, valor);
 }
 
 void leer_consola(t_log* logger)
@@ -102,6 +115,8 @@ void paquete(int conexion)
 
 void terminar_programa(int conexion, t_log* logger, t_config* config)
 {
+	log_destroy(logger);
+	config_destroy(config);
 	/* Y por ultimo, hay que liberar lo que utilizamos (conexion, log y config) 
 	  con las funciones de las commons y del TP mencionadas en el enunciado */
 }
