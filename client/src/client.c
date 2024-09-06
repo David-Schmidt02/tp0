@@ -1,5 +1,4 @@
 #include "client.h"
-#include <readline/readline.h>
 
 int main(void)
 {
@@ -27,12 +26,15 @@ int main(void)
 
 	//log_if_config_has_key(config, key)
 
-	log_if_config_has_key(logger, config, "IP");
-	log_if_config_has_key(logger, config, "PUERTO");
-	log_if_config_has_key(logger, config, "CLAVE");
+	log_if_config_has_key(logger, config, "IP", &ip);
+	log_if_config_has_key(logger, config, "PUERTO", &puerto);
+	log_if_config_has_key(logger, config, "CLAVE", &valor);
 
-
-
+	if(ip != NULL && puerto != NULL && valor != NULL)
+	{	printf("%s\n", ip);
+		printf("%s\n", puerto);
+		printf("%s\n", valor);
+	}
 	/* ---------------- LEER DE CONSOLA ---------------- */
 
 	leer_consola(logger);
@@ -67,7 +69,7 @@ t_log* iniciar_logger(void)
 
 t_config* iniciar_config(void)
 {
-	t_config* nuevo_config = config_create("cliente.config");		return nuevo_config;
+	t_config* nuevo_config = config_create("cliente.config");	
 	if(nuevo_config == NULL){
 		perror("No se pudo crear el .config por algún error!");
 		exit(EXIT_FAILURE);
@@ -75,7 +77,7 @@ t_config* iniciar_config(void)
 	return nuevo_config;
 }
 
-void log_if_config_has_key( t_log* logger,t_config* config, char* key)
+void log_if_config_has_key(t_log * logger,t_config * config, char * key, char ** var1)
 {
 	if(!config_has_property(config,key)){
 		perror("El config no tiene la key");
@@ -83,21 +85,22 @@ void log_if_config_has_key( t_log* logger,t_config* config, char* key)
 		exit(EXIT_FAILURE);
 	}
 	char* valor = config_get_string_value(config, key);
-	log_info(logger, valor);
+	log_info(logger, "Del parámetro %s se obtuvo: %s", key, valor);
+	*var1 = valor;
 }
 
 void leer_consola(t_log* logger)
 {
 	char* leido;
-
-	// La primera te la dejo de yapa
 	leido = readline("> ");
-
-	// El resto, las vamos leyendo y logueando hasta recibir un string vacío
-
-
-	// ¡No te olvides de liberar las lineas antes de regresar!
-
+	while(strcmp(leido, ""))
+	{
+		log_info(logger,"%s", leido);
+		printf("%s\n",leido);
+		free(leido);
+		leido = readline("> ");
+	}
+	free(leido);
 }
 
 void paquete(int conexion)

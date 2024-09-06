@@ -16,5 +16,6 @@ t_config* iniciar_config(void);
 void leer_consola(t_log*);
 void paquete(int);
 void terminar_programa(int, t_log*, t_config*);
+void log_if_config_has_key(t_log * logger,t_config * config, char * key, char ** var1);
 
 #endif /* CLIENT_H_ */
